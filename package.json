@@ -2,8 +2,16 @@
   "name": "nw-vue-devtools",
   "version": "1.0.0",
   "description": "A devDependency to add Vue-DevTools into NW.js",
-  "main": "index.js",
+  "main": "index.html",
   "scripts": {
+    "postinstall": "node postinstall.js",
+    "start": "nw .",
+    "test": "nw ."
+  },
+  "chromium-args": "--load-extension='./vue-devtools/shells/chrome'",
+  "devDependencies": {
+    "nw": "sdk",
+    "vue": "2.x.x"
   },
   "keywords": [
     "Vue.js",
@@ -23,4 +31,3 @@
     "url": "https://github.com/TheJaredWilcurt/nw-vue-devtools/issues"
   }
 }
-
