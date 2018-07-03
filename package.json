@@ -1,0 +1,26 @@
+{
+  "name": "nw-vue-devtools",
+  "version": "1.0.0",
+  "description": "A devDependency to add Vue-DevTools into NW.js",
+  "main": "index.js",
+  "scripts": {
+  },
+  "keywords": [
+    "Vue.js",
+    "NW.js",
+    "Developer Tools",
+    "vue-devtools",
+    "desktop"
+  ],
+  "author": "TheJaredWilcurt@users.noreply.github.com",
+  "license": "MIT",
+  "homepage": "https://github.com/TheJaredWilcurt/nw-vue-devtools#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheJaredWilcurt/nw-vue-devtools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TheJaredWilcurt/nw-vue-devtools/issues"
+  }
+}
+
