@@ -1,5 +1,7 @@
 # nw-vue-devtools
 
+[![Build Status](https://travis-ci.org/TheJaredWilcurt/nw-vue-devtools.svg?branch=master)](https://travis-ci.org/TheJaredWilcurt/nw-vue-devtools)
+
 This is a devDependency for adding Vue-DevTools into NW.js.
 
 
