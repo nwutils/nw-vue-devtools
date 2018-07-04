@@ -6,10 +6,14 @@
   "scripts": {
     "postinstall": "node postinstall.js",
     "start": "nw .",
-    "test": "nw ."
+    "test": "nw .",
+    "lint": "eslint --config=.eslintrc.js postinstall.js resetandclean.js",
+    "fix": "eslint --fix --config=.eslintrc.js postinstall.js resetandclean.js",
+    "clean": "node resetandclean.js"
   },
-  "chromium-args": "--load-extension='./vue-devtools/shells/chrome'",
+  "chromium-args": "--load-extension='./extension'",
   "devDependencies": {
+    "eslint": "5.x.x",
     "nw": "sdk",
     "vue": "2.x.x"
   },

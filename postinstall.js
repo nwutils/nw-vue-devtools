@@ -1,54 +1,66 @@
+/* eslint-disable no-console */
+
 let fs = require('fs');
 let path = require('path');
 let exec = require('child_process').execSync;
 
-let originalDir = __dirname + '';
-let clonedLocation = '';
-let destination = '';
-let weAreInsideNodeModules = false;
-let alreadyBeenRan = false;
-
 let postInstall = {
-  checkForClonedLocation: function () {
-    let nodeModules = path.join(originalDir, 'node_modules');
-    let nodeModulesDevTools = path.join(nodeModules, 'vue-devtools');
-    let parentNodeModules = path.resolve(originalDir, '..');
-    let parentDevTools = path.join(originalDir, '..', 'vue-devtools');
-
-    if (fs.existsSync(nodeModules) && fs.existsSync(nodeModulesDevTools)) {
-      clonedLocation = nodeModulesDevTools;
-    } else if (path.basename(parentNodeModules) === 'node_modules') {
-      weAreInsideNodeModules = true;
-      if (fs.existsSync(parentDevTools)) {
-        clonedLocation = parentDevTools;
-      }
-    }
+  data: {
+    alreadyBeenRan: false,
+    anErrorOccured: false,
+    // __dirname is the path to the folder that contains postinstall.js
+    originalDir: __dirname + '',
+    clonedLocation: path.join(__dirname, 'src', 'vue-devtools'),
+    builtExtension: path.join(__dirname, 'src', 'vue-devtools', 'shells', 'chrome'),
+    destination: path.join(__dirname, 'extension'),
+    flagFile: path.join(__dirname, 'extension', 'flag.txt')
   },
-  setDestination: function () {
-    if (weAreInsideNodeModules) {
-      destination = path.join(originalDir, '..', 'vue-devtools');
-    } else {
-      destination = path.join(originalDir, 'node_modules', 'vue-devtools');
-    }
-    destination = path.join(originalDir, 'vue-devtools');
-  },
-  checkIfPreviouslySuccessful: function () {
-    alreadyBeenRan = false;
-  },
+  /**
+   * Attempts to synchronously run an executable in a child process.
+   * Catches errors and logs them.
+   * @param  {string} args  The command to be ran in the command prompt/terminal.
+   */
   runner: function (args) {
     try {
       let runner = exec(args);
 
       let output = runner.toString().trim();
       if (output) {
-        // console.log(output);
+        // console.log('Vue-DevTools:', output);
       }
     } catch (err) {
-      console.log(err);
+      this.data.anErrorOccured = true;
+      console.log('Vue-DevTools:', err);
     }
   },
+  /**
+   * Checks if the flag file exists, signalling that everything else ran successfully.
+   */
+  checkIfPreviouslySuccessful: function () {
+    if (fs.existsSync(this.data.flagFile)) {
+      this.data.alreadyBeenRan = true;
+    }
+  },
+  cleanClonedLocation: function () {
+    let src = path.join(this.data.originalDir, 'src');
+    if (process.platform === 'win32') {
+      this.runner('rd /s /q ' + src);
+    } else {
+      this.runner('rm -r -f ' + src);
+    }
+  },
+  /**
+   * Attempt to clone Vue-DevTools with HTTPS, if that fails,
+   * try cloning with SSH, if that fails, log error.
+   */
   gitClone: function () {
-    console.log('Downloading Vue-DevTools source code');
+    if (fs.existsSync(this.data.builtExtension)) {
+      return;
+    }
+    if (fs.existsSync(this.data.clonedLocation)) {
+      this.cleanClonedLocation();
+    }
+    console.log('Vue-DevTools: Downloading Vue-DevTools source code');
 
     let executable = 'git clone --quiet';
     let url = 'https://github.com/vuejs/vue-devtools.git';
@@ -58,11 +70,12 @@ let postInstall = {
       executable,
       url,
       branch,
-      destination
+      this.data.clonedLocation
     ].join(' ').trim();
 
     try {
-      let httpsRunner = exec(args);
+      // httpsRunner
+      exec(args);
     } catch (err) {
       url = 'git@github.com:vuejs/vue-devtools.git';
 
@@ -70,57 +83,83 @@ let postInstall = {
         executable,
         url,
         branch,
-        destination
+        this.data.clonedLocation
       ].join(' ').trim();
 
       try {
-        let sshRunner = exec(args);
+        // sshRunner
+        exec(args);
       } catch (error) {
-        console.log('Error downloading Vue-DevTools.');
+        this.data.anErrorOccured = true;
+        console.log('Vue-DevTools: Error downloading Vue-DevTools.');
         console.log(error);
       }
     }
   },
-  npmInstallDevTools: function () {
-    console.log('Installing Vue-DevTools dependencies');
+  npmInstall: function () {
+    if (this.data.anErrorOccured) {
+      return;
+    }
+    console.log('Vue-DevTools: Installing Vue-DevTools dependencies');
 
-    process.chdir(destination);
+    process.chdir(this.data.clonedLocation);
 
     this.runner('npm install');
 
-    process.chdir(originalDir);
+    process.chdir(this.data.originalDir);
   },
-  buildDevTools: function () {
-    console.log('Building Vue-DevTools');
+  npmRunBuild: function () {
+    if (this.data.anErrorOccured) {
+      return;
+    }
+    console.log('Vue-DevTools: Building Vue-DevTools');
 
-    process.chdir(destination);
+    process.chdir(this.data.clonedLocation);
 
     this.runner('npm run build');
 
-    process.chdir(originalDir);
+    process.chdir(this.data.originalDir);
   },
   relocateDevTools: function () {
-    console.log('Installing Vue-DevTools in NW.js');
+    if (this.data.anErrorOccured) {
+      return;
+    }
+    console.log('Vue-DevTools: Installing Vue-DevTools in NW.js');
     try {
-      fs.renameSync(destination, path.join(originalDir, 'node_modules', 'vue-devtools'));
+      fs.renameSync(this.data.builtExtension, this.data.destination);
     } catch (err) {
-      console.log(err);
+      this.data.anErrorOccured = true;
+      console.log('Vue-DevTools:', err);
+    }
+  },
+  /**
+   * Create a text file in the extension directory to
+   * signify the operation completed successfully.
+   */
+  setSuccessFlag: function () {
+    if (this.data.anErrorOccured) {
+      return;
+    }
+    try {
+      fs.writeFileSync(this.data.flagFile, 'Success.');
+    } catch (err) {
+      this.data.anErrorOccured = true;
+      console.log('Vue-DevTools: Error creating flag file');
+      console.log('Vue-DevTools:', err);
     }
   },
   runEverything: function () {
-    this.checkForClonedLocation();
-    this.setDestination();
     this.checkIfPreviouslySuccessful();
-    // If we've already ran this once, we don't need to re-run it on every `npm install`
-    if (!clonedLocation) {
-      this.gitClone();
-      this.checkForClonedLocation();
+    if (this.data.alreadyBeenRan) {
+      return;
     }
-    if (!alreadyBeenRan) {
-      this.npmInstallDevTools();
-      this.buildDevTools();
-      // this.relocateDevTools();
-    }
+    this.gitClone();
+    this.npmInstall();
+    this.npmRunBuild();
+    this.relocateDevTools();
+    this.setSuccessFlag();
+
+    console.log('Vue-DevTools: Success.');
   }
 };
 

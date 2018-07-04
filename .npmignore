@@ -1,5 +1,11 @@
+extension/
+node_modules/
+src/
+vue-devtools/
 .editorconfig
+.eslintrc.js
 .gitignore
+.travis.yml
 index.html
 package-lock.json
-vue-devtools/
+resetandclean.js
