@@ -60,6 +60,9 @@ let postInstall = {
     if (fs.existsSync(this.data.clonedLocation)) {
       this.cleanClonedLocation();
     }
+    if (this.data.anErrorOccured) {
+      return;
+    }
     console.log('Vue-DevTools: Downloading Vue-DevTools source code');
 
     let executable = 'git clone --quiet';
@@ -149,6 +152,8 @@ let postInstall = {
     }
   },
   runEverything: function () {
+    console.log(112233, __dirname);
+    console.log(223344, this.data.originalDir);
     this.checkIfPreviouslySuccessful();
     if (this.data.alreadyBeenRan) {
       return;
