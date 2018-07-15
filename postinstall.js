@@ -117,9 +117,13 @@ let postInstall = {
     }
     console.log('Vue-DevTools: Building Vue-DevTools');
 
-    process.chdir(this.data.clonedLocation);
+    process.chdir(this.data.builtExtension);
 
-    this.runner('npm run build');
+    if (process.platform === 'win32') {
+      this.runner('..\\..\\node_modules\\.bin\\webpack.cmd --hide-modules');
+    } else {
+      this.runner('node ../../node_modules/.bin/webpack --hide-modules');
+    }
 
     process.chdir(this.data.originalDir);
   },
@@ -152,8 +156,6 @@ let postInstall = {
     }
   },
   runEverything: function () {
-    console.log(112233, __dirname);
-    console.log(223344, this.data.originalDir);
     this.checkIfPreviouslySuccessful();
     if (this.data.alreadyBeenRan) {
       return;
