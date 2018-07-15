@@ -31,8 +31,8 @@ let postInstall = {
     } catch (err) {
       this.data.anErrorOccured = true;
       console.log('Vue-DevTools:', err);
-      if (err.output) {
-        console.log('OUTPUT: ' + JSON.stringify(err.output, null, 2));
+      if (err.stderr) {
+        console.log('STDERR: ' + err.stderr.toString());
       }
       if (err.stdout) {
         console.log('STDOUT: ' + err.stdout.toString());
@@ -69,7 +69,7 @@ let postInstall = {
     if (this.data.anErrorOccured) {
       return;
     }
-    console.log('Vue-DevTools: Downloading Vue-DevTools source code');
+    console.log('Vue-DevTools: Downloading latest Vue-DevTools source code');
 
     let executable = 'git clone --quiet';
     let url = 'https://github.com/vuejs/vue-devtools.git';
