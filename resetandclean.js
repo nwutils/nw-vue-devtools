@@ -6,6 +6,7 @@ let exec = require('child_process').execSync;
 
 let taskRunner = {
   runner: function (args) {
+    console.log(args);
     try {
       let runner = exec(args);
 
@@ -17,27 +18,36 @@ let taskRunner = {
       // console.log(err);
     }
   },
-  resetAndClean: function () {
-    if (process.platform === 'win32') {
-      this.runner('rd /s /q src');
-      this.runner('rd /s /q src');
-      this.runner('rd /s /q src');
-      this.runner('rd /s /q extension');
-      this.runner('rd /s /q extension');
-      this.runner('rd /s /q extension');
-      this.runner('rd /s /q node_modules');
-      this.runner('rd /s /q node_modules');
-      this.runner('rd /s /q node_modules');
-    } else {
-      this.runner('rm -r -f src');
-      this.runner('rm -r -f extension');
-      this.runner('rm -r -f node_modules');
+  deleteFolder: function (folder) {
+    let directory = path.join('.', folder);
+
+    if (fs.existsSync(directory)) {
+      if (process.platform === 'win32') {
+        this.runner('rd /s /q ' + folder);
+      } else {
+        this.runner('rm -r -f ' + folder);
+      }
+    }
+    if (fs.existsSync(directory)) {
+      this.deleteFolder(folder);
+    }
+  },
+  deleteFile: function (file) {
+    let item = path.join('.', file);
+
+    if (fs.existsSync(item)) {
+      fs.unlinkSync(item);
     }
 
-    let lock = path.join('.', 'package-lock.json');
-    if (fs.existsSync(lock)) {
-      fs.unlinkSync(lock);
+    if (fs.existsSync(item)) {
+      this.deleteFile(file);
     }
+  },
+  resetAndClean: function () {
+    this.deleteFolder('src');
+    this.deleteFolder('extension');
+    this.deleteFolder('node_modules');
+    this.deleteFile('package-lock.json');
   }
 };
 

@@ -9,7 +9,8 @@
     "test": "nw .",
     "lint": "eslint --config=.eslintrc.js postinstall.js resetandclean.js",
     "fix": "eslint --fix --config=.eslintrc.js postinstall.js resetandclean.js",
-    "clean": "node resetandclean.js"
+    "clean": "node resetandclean.js",
+    "reset": "node resetandclean.js"
   },
   "chromium-args": "--load-extension='./extension'",
   "devDependencies": {
