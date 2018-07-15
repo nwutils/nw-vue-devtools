@@ -172,7 +172,11 @@ let postInstall = {
     this.relocateDevTools();
     this.setSuccessFlag();
 
-    console.log('Vue-DevTools: Success.');
+    if (this.data.anErrorOccured) {
+      console.log('Vue-DevTools: Finished with errors.')
+    } else {
+      console.log('Vue-DevTools: Success.');
+    }
   }
 };
 
