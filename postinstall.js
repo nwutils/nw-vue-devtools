@@ -31,6 +31,12 @@ let postInstall = {
     } catch (err) {
       this.data.anErrorOccured = true;
       console.log('Vue-DevTools:', err);
+      if (err.output) {
+        console.log('OUTPUT: ' + JSON.stringify(err.output, null, 2));
+      }
+      if (err.stdout) {
+        console.log('STDOUT: ' + err.stdout.toString());
+      }
     }
   },
   /**
