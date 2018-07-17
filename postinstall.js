@@ -125,9 +125,6 @@ let postInstall = {
 
     process.chdir(this.data.builtExtension);
 
-    let hideModules = ' --hide-modules';
-    hideModules = '';
-
     if (process.platform === 'win32') {
       this.runner('..\\..\\node_modules\\.bin\\webpack.cmd --progress --hide-modules');
     } else {
