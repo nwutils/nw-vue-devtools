@@ -146,7 +146,7 @@ let postInstall = {
     config = config.join('\n');
 
     try {
-      fs.writeFileSync(this.data.buildConfig);
+      fs.writeFileSync(this.data.buildConfig, config);
     } catch (err) {
       console.log('Vue-DevTools: Error writing Vue-Devtools config file.');
       this.data.anErrorOccured = true;
