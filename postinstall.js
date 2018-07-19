@@ -12,6 +12,7 @@ let postInstall = {
     originalDir: __dirname + '',
     clonedLocation: path.join(__dirname, 'src', 'vue-devtools'),
     builtExtension: path.join(__dirname, 'src', 'vue-devtools', 'shells', 'chrome'),
+    buildConfig: path.join(__dirname, 'src', 'vue-devtools', 'shells', 'createConfig.js'),
     destination: path.join(__dirname, 'extension'),
     flagFile: path.join(__dirname, 'extension', 'flag.txt')
   },
@@ -31,6 +32,12 @@ let postInstall = {
     } catch (err) {
       this.data.anErrorOccured = true;
       console.log('Vue-DevTools:', err);
+      if (err.stderr) {
+        console.log('STDERR: ' + err.stderr.toString());
+      }
+      if (err.stdout) {
+        console.log('STDOUT: ' + err.stdout.toString());
+      }
     }
   },
   /**
@@ -60,7 +67,10 @@ let postInstall = {
     if (fs.existsSync(this.data.clonedLocation)) {
       this.cleanClonedLocation();
     }
-    console.log('Vue-DevTools: Downloading Vue-DevTools source code');
+    if (this.data.anErrorOccured) {
+      return;
+    }
+    console.log('Vue-DevTools: Downloading latest Vue-DevTools source code');
 
     let executable = 'git clone --quiet';
     let url = 'https://github.com/vuejs/vue-devtools.git';
@@ -108,15 +118,54 @@ let postInstall = {
 
     process.chdir(this.data.originalDir);
   },
+  modifyWebpackConfig: function () {
+    if (this.data.anErrorOccured) {
+      return;
+    }
+    console.log('Vue-DevTools: Modifying Webpack Configuration');
+
+    let config = '';
+
+    try {
+      config = fs.readFileSync(this.data.buildConfig);
+    } catch (err) {
+      console.log('Vue-DevTools: Error reading Vue-Devtools config file.');
+      this.data.anErrorOccured = true;
+      return;
+    }
+
+    config = String(config);
+    // Convert CRLF to LF
+    config = config.split('\r\n').join('\n');
+    config = config.split('\n');
+
+    config = config.filter(function (line) {
+      return !line.includes('exclude: /node_modules');
+    });
+
+    config = config.join('\n');
+
+    try {
+      fs.writeFileSync(this.data.buildConfig, config);
+    } catch (err) {
+      console.log('Vue-DevTools: Error writing Vue-Devtools config file.');
+      this.data.anErrorOccured = true;
+      return;
+    }
+  },
   npmRunBuild: function () {
     if (this.data.anErrorOccured) {
       return;
     }
     console.log('Vue-DevTools: Building Vue-DevTools');
 
-    process.chdir(this.data.clonedLocation);
+    process.chdir(this.data.builtExtension);
 
-    this.runner('npm run build');
+    if (process.platform === 'win32') {
+      this.runner('..\\..\\node_modules\\.bin\\webpack.cmd --hide-modules');
+    } else {
+      this.runner('node ../../node_modules/.bin/webpack --hide-modules');
+    }
 
     process.chdir(this.data.originalDir);
   },
@@ -155,11 +204,16 @@ let postInstall = {
     }
     this.gitClone();
     this.npmInstall();
+    this.modifyWebpackConfig();
     this.npmRunBuild();
     this.relocateDevTools();
     this.setSuccessFlag();
 
-    console.log('Vue-DevTools: Success.');
+    if (this.data.anErrorOccured) {
+      console.log('Vue-DevTools: Finished with errors.');
+    } else {
+      console.log('Vue-DevTools: Success.');
+    }
   }
 };
 
