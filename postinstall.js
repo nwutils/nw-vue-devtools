@@ -210,7 +210,7 @@ let postInstall = {
     this.setSuccessFlag();
 
     if (this.data.anErrorOccured) {
-      console.log('Vue-DevTools: Finished with errors.')
+      console.log('Vue-DevTools: Finished with errors.');
     } else {
       console.log('Vue-DevTools: Success.');
     }
