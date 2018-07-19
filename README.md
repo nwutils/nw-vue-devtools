@@ -37,3 +37,16 @@ This dependency will run an npm script that:
 * Places the built version in `node_modules/nw-vue-devtools/extension`.
 * Tries to recover from past failures on future re-runs.
 * Skips everything if the extension had already been built successfully.
+
+
+
+* * *
+
+
+
+## In Use
+
+If you like this, also checkout:
+
+* **[Vue Desktop Basic](https://github.com/TheJaredWilcurt/vue-desktop-basic)** - a boilerplate for making Vue desktop apps with NW.js
+  * **Features:** NW.js, Vue, Vuex, Vue-Router, Vue-DevTools, HTTP-Vue-Loader, ESLint, Sass, Sasslint
