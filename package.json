@@ -1,6 +1,6 @@
 {
   "name": "nw-vue-devtools",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A devDependency to add Vue-DevTools into NW.js",
   "main": "index.html",
   "scripts": {
