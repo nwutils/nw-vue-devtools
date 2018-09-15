@@ -76,11 +76,18 @@ let postInstall = {
     let url = 'https://github.com/vuejs/vue-devtools.git';
     let branch = '-b master';
 
+    let clonedLocation;
+    if (process.platform === 'win32') {
+      clonedLocation = `"${this.data.clonedLocation}"`;
+    } else {
+      clonedLocation = this.data.clonedLocation.replace(/[ ]/g, '\\ ');
+    }
+
     let args = [
       executable,
       url,
       branch,
-      this.data.clonedLocation
+      clonedLocation
     ].join(' ').trim();
 
     try {
@@ -93,7 +100,7 @@ let postInstall = {
         executable,
         url,
         branch,
-        this.data.clonedLocation
+        clonedLocation
       ].join(' ').trim();
 
       try {
