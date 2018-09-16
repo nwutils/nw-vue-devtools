@@ -25,7 +25,7 @@ You must have Git, Node, and npm installed globally.
     ```
 1. Vue.js must be in use in your app, and cannot be minified (`vue.js` not `vue.min.js`).
 
-If you are using `nwjs-builder-phoenix` then add in `"chromium-args"` to your `package.json` `build.strippedProperties` array.
+If you are using `nwjs-builder-phoenix` then add in `"chromium-args"` to your `package.json` `build.strippedProperties` array ([more info](https://github.com/evshiron/nwjs-builder-phoenix/blob/master/docs/Options.md#build---buildconfig)).
 
 
 
@@ -51,4 +51,4 @@ This dependency will run an npm script that:
 If you like this, also checkout:
 
 * **[Vue Desktop Basic](https://github.com/TheJaredWilcurt/vue-desktop-basic)** - a boilerplate for making Vue desktop apps with NW.js
-  * **Features:** NW.js, Vue, Vuex, Vue-Router, Vue-DevTools, HTTP-Vue-Loader, ESLint, Sass, Sasslint
+  * **Features:** NW.js, Vue, Vuex, Vue-Router, Vue-DevTools, HTTP-Vue-Loader, ESLint, Sass, Sasslint, nwjs-builder-phoenix
