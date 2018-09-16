@@ -78,7 +78,7 @@ let postInstall = {
 
     let clonedLocation;
     if (process.platform === 'win32') {
-      clonedLocation = `"${this.data.clonedLocation}"`;
+      clonedLocation = '"' + this.data.clonedLocation + '"';
     } else {
       /*
        * This regex replaced spaces with a escaped space.
