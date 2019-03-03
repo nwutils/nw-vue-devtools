@@ -191,6 +191,26 @@ let postInstall = {
     }
   },
   /**
+   * Fix manifest.json permissions to allow proxy injection in nw.js > 0.31.5
+   * @see https://github.com/nwjs/nw.js/issues/6744#issuecomment-410476111
+   */
+  fixPermissions: function () {
+    if (this.data.anErrorOccured) {
+      return;
+    }
+    console.log('Vue-DevTools: Fixing Vue-DevTools permissions');
+    const manifestFilePath = path.resolve(this.data.destination, 'manifest.json');
+    const manifest = require(manifestFilePath);
+    manifest.permissions.push('*://*/*');
+    try {
+      fs.writeFileSync(manifestFilePath, JSON.stringify(manifest));
+    } catch (error) {
+      this.data.anErrorOccured = true;
+      console.log('Vue-DevTools: Error saving manifest.json file');
+      console.log('Vue-DevTools:', error);
+    }
+  },
+  /**
    * Create a text file in the extension directory to
    * signify the operation completed successfully.
    */
@@ -216,6 +236,7 @@ let postInstall = {
     this.modifyWebpackConfig();
     this.npmRunBuild();
     this.relocateDevTools();
+    this.fixPermissions();
     this.setSuccessFlag();
 
     if (this.data.anErrorOccured) {
