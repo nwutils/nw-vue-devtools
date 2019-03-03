@@ -203,7 +203,7 @@ let postInstall = {
     const manifest = require(manifestFilePath);
     manifest.permissions.push('*://*/*');
     try {
-      fs.writeFileSync(manifestFilePath, JSON.stringify(manifest));
+      fs.writeFileSync(manifestFilePath, JSON.stringify(manifest, null, 2));
     } catch (error) {
       this.data.anErrorOccured = true;
       console.log('Vue-DevTools: Error saving manifest.json file');
