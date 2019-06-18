@@ -48,6 +48,16 @@ This dependency will run an npm script that:
 
 
 
+## See Also:
+
+* [nw-vue-devtools-prebuilt](https://github.com/DimPaDev/nw-vue-devtools-prebuilt) - Downloads the CRX file from the Chrome Store, unzips and modifies it for use in Nw.js. May be a better option for some.
+
+
+
+* * *
+
+
+
 ## In Use
 
 If you like this, also checkout:
