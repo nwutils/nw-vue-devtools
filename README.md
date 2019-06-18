@@ -60,7 +60,6 @@ This dependency will run an npm script that:
 
 ## In Use
 
-If you like this, also checkout:
+This package is used by:
 
-* **[Vue Desktop Basic](https://github.com/TheJaredWilcurt/vue-desktop-basic)** - a boilerplate for making Vue desktop apps with NW.js
-  * **Features:** NW.js, Vue, Vuex, Vue-Router, Vue-DevTools, HTTP-Vue-Loader, ESLint, Sass, Sasslint, nwjs-builder-phoenix
+* https://github.com/nwutils/nw-vue-devtools/network/dependents
