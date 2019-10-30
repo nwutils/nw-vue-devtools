@@ -6,6 +6,7 @@ vue-devtools/
 .eslintrc.js
 .gitignore
 .travis.yml
+CODE_OF_CONDUCT.md
 index.html
 package-lock.json
 resetandclean.js
