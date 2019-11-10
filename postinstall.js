@@ -1,18 +1,22 @@
 /* eslint-disable no-console */
 
-let fs = require('fs');
-let path = require('path');
-let exec = require('child_process').execSync;
+const fs = require('fs');
+const path = require('path');
+const https = require('https');
+const exec = require('child_process').execSync;
 
-let postInstall = {
+const postInstall = {
   data: {
     alreadyBeenRan: false,
     anErrorOccured: false,
+    tags: [],
+    latestTag: null,
     // __dirname is the path to the folder that contains postinstall.js
     originalDir: __dirname + '',
+    webpackBinary: path.join(__dirname, 'node_modules', '.bin', 'webpack-cli'),
     clonedLocation: path.join(__dirname, 'src', 'vue-devtools'),
-    builtExtension: path.join(__dirname, 'src', 'vue-devtools', 'shells', 'chrome'),
-    buildConfig: path.join(__dirname, 'src', 'vue-devtools', 'shells', 'createConfig.js'),
+    builtExtension: path.join(__dirname, 'src', 'vue-devtools', 'packages', 'shell-chrome'),
+    buildConfig: path.join(__dirname, 'src', 'vue-devtools', 'packages', 'build-tools', 'src', 'createConfig.js'),
     destination: path.join(__dirname, 'extension'),
     flagFile: path.join(__dirname, 'extension', 'flag.txt')
   },
@@ -22,6 +26,7 @@ let postInstall = {
    * @param  {string} args  The command to be ran in the command prompt/terminal.
    */
   runner: function (args) {
+    console.log(args);
     try {
       let runner = exec(args);
 
@@ -40,6 +45,34 @@ let postInstall = {
       }
     }
   },
+  getData: function (url) {
+    return new Promise(function (resolve, reject) {
+      let options = {
+        headers: {
+          'User-Agent': 'Node.js'
+        }
+      };
+      https.get(url, options, function (response) {
+        let chunksOfData = [];
+
+        response.on('data', function (fragments) {
+          chunksOfData.push(fragments);
+        });
+
+        response.on('end', function () {
+          let responseBody = Buffer.concat(chunksOfData);
+          resolve(responseBody.toString());
+        });
+
+        response.on('error', function (error) {
+          console.log('Vue-DevTools: Error getting list of latest releases.');
+          console.log('HTTP ERROR:', error);
+          console.log('Vue-DevTools: Defaulting to master branch (older version)');
+          reject();
+        });
+      });
+    });
+  },
   /**
    * Checks if the flag file exists, signalling that everything else ran successfully.
    */
@@ -54,6 +87,35 @@ let postInstall = {
       this.runner('rd /s /q ' + src);
     } else {
       this.runner('rm -r -f ' + src);
+    }
+  },
+  getTags: async function () {
+    console.log('Vue-DevTools: Checking for latest version');
+    const url = 'https://api.github.com/repos/vuejs/vue-devtools/tags';
+    let result = await this.getData(url);
+    this.data.tags = JSON.parse(result);
+    return;
+  },
+  setLatestTag: function () {
+    if (typeof(this.data.tags) !== 'object' || !Array.isArray(this.data.tags)) {
+      this.data.latestTag = null;
+      return;
+    }
+    let acceptableTags = [];
+    this.data.tags.forEach(function (tag) {
+      if (
+        tag.name &&
+        !tag.name.includes('alpha') &&
+        !tag.name.includes('beta') &&
+        !tag.name.includes('rc') &&
+        !tag.name.includes('-')
+      ) {
+        acceptableTags.push(tag);
+      }
+    });
+
+    if (acceptableTags.length) {
+      this.data.latestTag = acceptableTags[0].name;
     }
   },
   /**
@@ -72,16 +134,16 @@ let postInstall = {
     }
     console.log('Vue-DevTools: Downloading latest Vue-DevTools source code');
 
-    let executable = 'git clone --quiet';
+    let executable = 'git clone --quiet --single-branch';
     let url = 'https://github.com/vuejs/vue-devtools.git';
-    let branch = '-b master';
+    let branch = '-b ' + (this.data.latestTag || 'master');
 
     let clonedLocation;
     if (process.platform === 'win32') {
       clonedLocation = '"' + this.data.clonedLocation + '"';
     } else {
       // Regex replaces spaces with a escaped spaces
-      // 'path with  space' => 'path\ with\ \ space'
+      // 'path with  spaces' => 'path\ with\ \ spaces'
       clonedLocation = this.data.clonedLocation.replace(/[ ]/g, '\\ ');
     }
 
@@ -171,9 +233,9 @@ let postInstall = {
     process.chdir(this.data.builtExtension);
 
     if (process.platform === 'win32') {
-      this.runner('..\\..\\node_modules\\.bin\\webpack.cmd --hide-modules');
+      this.runner(this.data.webpackBinary + '.cmd --hide-modules');
     } else {
-      this.runner('node ../../node_modules/.bin/webpack --hide-modules');
+      this.runner('node ' + this.data.webpackBinary + ' --hide-modules');
     }
 
     process.chdir(this.data.originalDir);
@@ -226,11 +288,13 @@ let postInstall = {
       console.log('Vue-DevTools:', err);
     }
   },
-  runEverything: function () {
+  runEverything: async function () {
     this.checkIfPreviouslySuccessful();
     if (this.data.alreadyBeenRan) {
       return;
     }
+    await this.getTags();
+    this.setLatestTag();
     this.gitClone();
     this.npmInstall();
     this.modifyWebpackConfig();

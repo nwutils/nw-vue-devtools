@@ -8,6 +8,9 @@ module.exports = {
         'browser': true,
         'node': true
     },
+    'globals': {
+        'Promise': true
+    },
     'extends': 'eslint:recommended',
     'rules': {
         'brace-style':                 ['error', '1tbs', { 'allowSingleLine': true }],
