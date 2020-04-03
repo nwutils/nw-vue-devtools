@@ -2,6 +2,16 @@
 
 [![Build Status](https://travis-ci.org/nwutils/nw-vue-devtools.svg?branch=master)](https://travis-ci.org/nwutils/nw-vue-devtools) [![npm version](https://img.shields.io/npm/v/nw-vue-devtools.svg)](https://www.npmjs.com/package/nw-vue-devtools) [![MIT license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/TheJaredWilcurt/nw-vue-devtools/blob/master/LICENSE)
 
+* * *
+
+# DEPRECATION NOTICE
+
+We are no longer able to automate building from the Vue-DevTools source anymore due to their adoption of Yarn. When Yarn innevitably dies after npm 7 or 8, and they switch back to npm, we may be able to get the automation working again. But until then, there is an alternative that downloads directly from the Chrome Webstore a prebuilt version, then modifies it for NW.js. I recommend using that:
+
+* https://github.com/DimPaDev/nw-vue-devtools-prebuilt
+
+
+* * *
 
 
 This is a devDependency for adding Vue-DevTools into NW.js.
