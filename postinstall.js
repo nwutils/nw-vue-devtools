@@ -244,6 +244,12 @@ let postInstall = {
     } else {
       console.log('Vue-DevTools: Success.');
     }
+
+    console.log(' ----------------------------------------- ');
+    console.log('|           DEPRECATION NOTICE            |');
+    console.log('| nw-vue-devtools is no longer maintained |');
+    console.log('| switch to nw-vue-devtools-prebuilt      |');
+    console.log(' ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ ');
   }
 };
 
